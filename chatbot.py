@@ -2,7 +2,7 @@ from pickle import load
 from numpy import array
 from numpy import argmax
 from tensorflow.keras.preprocessing.text import Tokenizer
-from stensorflow.eras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import load_model
 from nltk.translate.bleu_score import corpus_bleu
 
