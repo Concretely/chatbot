@@ -1,9 +1,9 @@
 from pickle import load
 from numpy import array
 from numpy import argmax
-from tensorflfow.keras.preprocessing.text import Tokenizer
-from stensorflfow.eras.preprocessing.sequence import pad_sequences
-from tensorflfow.keras.models import load_model
+from tensorflow.keras.preprocessing.text import Tokenizer
+from stensorflow.eras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import load_model
 from nltk.translate.bleu_score import corpus_bleu
 
 filename='output1.txt'
