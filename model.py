@@ -5,6 +5,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.utils import to_categorical
 #from tensorflow.keras.utils.vis_utils import plot_model
 from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import LSTM
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Embedding
@@ -13,6 +14,8 @@ from tensorflow.keras.layers import TimeDistributed
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.callbacks import ModelCheckpoint
+#from attention import AttentionDecoder
+
 
 # load a clean dataset
 def load_clean_sentences(filename):
@@ -20,7 +23,7 @@ def load_clean_sentences(filename):
 
 # fit a tokenizer
 def create_tokenizer(lines):
-	tokenizer = Tokenizer()
+	tokenizer = Tokenizer(num_words=5000)
 	tokenizer.fit_on_texts(lines)
 	return tokenizer
 
@@ -54,28 +57,29 @@ def define_model(src_vocab, tar_vocab, src_timesteps, tar_timesteps, n_units):
 	model.add(RepeatVector(tar_timesteps))
 	model.add(LSTM(n_units, return_sequences=True))
 	model.add(Dropout(0.2))
-	#model.add(BatchNormalization())
+	model.add(BatchNormalization())
 	model.add(TimeDistributed(Dense(tar_vocab, activation='softmax')))
 	return model
 
+
 # load datasets
-dataset = load_clean_sentences('/floyd/input/data/tweet-response-both.pkl')
-train = load_clean_sentences('/floyd/input/data/tweet-response-train.pkl')
-test = load_clean_sentences('/floyd/input/data/tweet-response-test.pkl')
+dataset = load_clean_sentences('data/tweet-response-both.pkl')
+train = load_clean_sentences('data/tweet-response-train.pkl')
+test = load_clean_sentences('data/tweet-response-test.pkl')
 
 # prepare english tokenizer
 tweet_tokenizer = create_tokenizer(dataset[:, 0])
-tweet_vocab_size = len(tweet_tokenizer.word_index) + 1
+tweet_vocab_size = min(len(tweet_tokenizer.word_index), 5000) + 1
 tweet_length = max_length(dataset[:, 0])
 print('Tweet Vocabulary Size: %d' % tweet_vocab_size)
 print('Tweet Max Length: %d' % (tweet_length))
 # prepare german tokenizer
 response_tokenizer = create_tokenizer(dataset[:, 1])
-response_vocab_size = len(response_tokenizer.word_index) + 1
+response_vocab_size = min(len(response_tokenizer.word_index), 5000) + 1
 response_length = max_length(dataset[:, 1])
 print('Response Vocabulary Size: %d' % response_vocab_size)
 print('Response Max Length: %d' % (response_length))
-
+del dataset
 # prepare training data
 trainX = encode_sequences(tweet_tokenizer, tweet_length, train[:, 0])
 trainY = encode_sequences(response_tokenizer, response_length, train[:, 1])
@@ -87,6 +91,8 @@ testY = encode_output(testY, response_vocab_size)
 
 # define model
 model = define_model(tweet_vocab_size, response_vocab_size, tweet_length, response_length, 256)
+#model = define_non_seq_model(tweet_vocab_size, response_vocab_size, tweet_length, response_length, 256)
+
 model.compile(optimizer='adam', loss='categorical_crossentropy')
 # summarize defined model
 print(model.summary())
@@ -94,4 +100,4 @@ print(model.summary())
 # fit model
 filename = 'model.h5'
 checkpoint = ModelCheckpoint(filename, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-model.fit(trainX, trainY, epochs=60, batch_size=32, validation_data=(testX, testY), callbacks=[checkpoint], verbose=2)
+model.fit(trainX, trainY, epochs=6, batch_size=32, validation_data=(testX, testY), callbacks=[checkpoint], verbose=2)
