@@ -16,7 +16,7 @@ def load_doc(filename):
 	return text
 
 # split a loaded document into sentences
-def to_pairs(doc):
+def to_pairs(doc):	
 	lines = doc.strip().split('\n')
 	pairs = []
 	print(len(lines))
@@ -61,9 +61,9 @@ def save_clean_data(sentences, filename):
 	print('Saved: %s' % filename)
 
 # load dataset
-filename = 'data/results_20000.tsv'
+filename = 'data/results.tsv'
 doc = load_doc(filename)
-# split into english-german pairs
+# split into tweet/response
 #to_pairs(doc)
 pairs = to_pairs(doc)
 
@@ -72,7 +72,7 @@ print(np.shape(pairs))
 clean_pairs = clean_pairs(pairs)
 print(np.shape(clean_pairs))
 # save clean pairs to file
-save_clean_data(clean_pairs, 'tweet-response.pkl')
+save_clean_data(clean_pairs, 'data/tweet-response.pkl')
 # spot check
 for i in range(10):
 	print('[%s] => [%s]' % (clean_pairs[i,0], clean_pairs[i,1]))

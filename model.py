@@ -1,3 +1,4 @@
+﻿
 from pickle import load
 from numpy import array
 from tensorflow.keras.preprocessing.text import Tokenizer
@@ -14,6 +15,7 @@ from tensorflow.keras.layers import TimeDistributed
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.callbacks import ModelCheckpoint
+from keras.optimizers import Adam
 #from attention import AttentionDecoder
 
 
@@ -56,16 +58,22 @@ def define_model(src_vocab, tar_vocab, src_timesteps, tar_timesteps, n_units):
 	model.add(LSTM(n_units))
 	model.add(RepeatVector(tar_timesteps))
 	model.add(LSTM(n_units, return_sequences=True))
-	model.add(Dropout(0.2))
+	model.add(Dropout(0.5))
 	model.add(BatchNormalization())
 	model.add(TimeDistributed(Dense(tar_vocab, activation='softmax')))
 	return model
 
-
+data_folder='data'
+#data_folder = '/floyd/input/data'
 # load datasets
-dataset = load_clean_sentences('data/tweet-response-both.pkl')
-train = load_clean_sentences('data/tweet-response-train.pkl')
-test = load_clean_sentences('data/tweet-response-test.pkl')
+dataset = load_clean_sentences(data_folder+'/tweet-response-both.pkl')
+train = load_clean_sentences(data_folder+'/tweet-response-train.pkl')
+test = load_clean_sentences(data_folder+'/tweet-response-test.pkl')
+
+
+
+
+
 
 # prepare english tokenizer
 tweet_tokenizer = create_tokenizer(dataset[:, 0])
@@ -79,25 +87,51 @@ response_vocab_size = min(len(response_tokenizer.word_index), 5000) + 1
 response_length = max_length(dataset[:, 1])
 print('Response Vocabulary Size: %d' % response_vocab_size)
 print('Response Max Length: %d' % (response_length))
-del dataset
-# prepare training data
-trainX = encode_sequences(tweet_tokenizer, tweet_length, train[:, 0])
-trainY = encode_sequences(response_tokenizer, response_length, train[:, 1])
-trainY = encode_output(trainY, response_vocab_size)
-# prepare validation data
-testX = encode_sequences(tweet_tokenizer, tweet_length, test[:, 0])
-testY = encode_sequences(response_tokenizer, response_length, test[:, 1])
-testY = encode_output(testY, response_vocab_size)
+del dataset 
 
 # define model
 model = define_model(tweet_vocab_size, response_vocab_size, tweet_length, response_length, 256)
 #model = define_non_seq_model(tweet_vocab_size, response_vocab_size, tweet_length, response_length, 256)
-
+adam = Adam(lr=0.0001, decay=0.00001)
 model.compile(optimizer='adam', loss='categorical_crossentropy')
 # summarize defined model
 print(model.summary())
-#model(model, to_file='model.png', show_shapes=True)
-# fit model
-filename = 'model.h5'
-checkpoint = ModelCheckpoint(filename, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-model.fit(trainX, trainY, epochs=6, batch_size=32, validation_data=(testX, testY), callbacks=[checkpoint], verbose=2)
+
+
+
+print('preparing training data')
+# prepare training data
+trainX = encode_sequences(tweet_tokenizer, tweet_length, train[:, 0])
+trainY = encode_sequences(response_tokenizer, response_length, train[:, 1])
+#trainY = encode_output(trainY, response_vocab_size)
+# prepare validation data
+testX = encode_sequences(tweet_tokenizer, tweet_length, test[:, 0])
+testY = encode_sequences(response_tokenizer, response_length, test[:, 1])
+#testY = encode_output(testY, response_vocab_size)
+
+print('processing batch_test')
+batch_testX = testX[:1000]
+batch_testY = testY[:1000]
+batch_testY = encode_output(batch_testY, response_vocab_size)
+
+
+MINI_BATCH_SIZE=1000
+
+for i in range(200):
+	batch_start = i * MINI_BATCH_SIZE
+	batch_end = batch_start+MINI_BATCH_SIZE
+	print('processing batch_train')
+	batch_trainX = trainX[batch_start:batch_end]
+	batch_trainY = trainY[batch_start:batch_end]
+	batch_trainY = encode_output(batch_trainY, response_vocab_size)
+
+	print(batch_trainX.shape)
+	print(batch_trainY.shape)
+	
+	print('starting training')
+
+	#model(model, to_file='model.png', show_shapes=True)
+	# fit model
+	filename = 'model.h5'
+	checkpoint = ModelCheckpoint(filename, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+	model.fit(batch_trainX, batch_trainY, epochs=1, batch_size=256, validation_data=(batch_testX, batch_testY), callbacks=[checkpoint], verbose=2)
