@@ -134,4 +134,4 @@ for i in range(200):
 	# fit model
 	filename = 'model.h5'
 	checkpoint = ModelCheckpoint(filename, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-	model.fit(batch_trainX, batch_trainY, epochs=1, batch_size=256, validation_data=(batch_testX, batch_testY), callbacks=[checkpoint], verbose=2)
+	model.fit(batch_trainX, batch_trainY, epochs=64, batch_size=256, validation_data=(batch_testX, batch_testY), callbacks=[checkpoint], verbose=2)
