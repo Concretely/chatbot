@@ -122,7 +122,7 @@ batch_testY = encode_output(batch_testY, response_vocab_size)
 
 MINI_BATCH_SIZE=1000
 
-for i in range(30):
+for i in range(250):
 	batch_start = i * MINI_BATCH_SIZE
 	batch_end = batch_start+MINI_BATCH_SIZE
 	print('batch_start={} batch_end={}'.format(batch_start, batch_end))
@@ -140,4 +140,4 @@ for i in range(30):
 	# fit model
 	filename = 'model.h5'
 	checkpoint = ModelCheckpoint(filename, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-	model.fit(batch_trainX, batch_trainY, epochs=32, batch_size=64, validation_data=(batch_testX, batch_testY), callbacks=[checkpoint], verbose=2)
+	model.fit(batch_trainX, batch_trainY, epochs=8, batch_size=64, validation_data=(batch_testX, batch_testY), callbacks=[checkpoint], verbose=2)
