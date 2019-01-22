@@ -17,8 +17,9 @@ from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.callbacks import ModelCheckpoint
 from keras.optimizers import Adam
 #from attention import AttentionDecoder
-
-
+import random
+import numpy as np
+	
 # load a clean dataset
 def load_clean_sentences(filename):
 	return load(open(filename, 'rb'))
@@ -109,17 +110,22 @@ testX = encode_sequences(tweet_tokenizer, tweet_length, test[:, 0])
 testY = encode_sequences(response_tokenizer, response_length, test[:, 1])
 #testY = encode_output(testY, response_vocab_size)
 
-print('processing batch_test')
-batch_testX = testX[:1000]
-batch_testY = testY[:1000]
+idx = np.random.choice(np.arange(len(testX)), 1000, replace=False)
+batch_testX = testX[idx]
+batch_testY = testY[idx]
+
+
+#batch_testX = testX[:1000]
+#batch_testY = testY[:1000]
 batch_testY = encode_output(batch_testY, response_vocab_size)
 
 
 MINI_BATCH_SIZE=1000
 
-for i in range(200):
+for i in range(30):
 	batch_start = i * MINI_BATCH_SIZE
 	batch_end = batch_start+MINI_BATCH_SIZE
+	print('batch_start={} batch_end={}'.format(batch_start, batch_end))
 	print('processing batch_train')
 	batch_trainX = trainX[batch_start:batch_end]
 	batch_trainY = trainY[batch_start:batch_end]
@@ -134,4 +140,4 @@ for i in range(200):
 	# fit model
 	filename = 'model.h5'
 	checkpoint = ModelCheckpoint(filename, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-	model.fit(batch_trainX, batch_trainY, epochs=64, batch_size=256, validation_data=(batch_testX, batch_testY), callbacks=[checkpoint], verbose=2)
+	model.fit(batch_trainX, batch_trainY, epochs=32, batch_size=64, validation_data=(batch_testX, batch_testY), callbacks=[checkpoint], verbose=2)

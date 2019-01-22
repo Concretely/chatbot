@@ -61,7 +61,7 @@ def save_clean_data(sentences, filename):
 	print('Saved: %s' % filename)
 
 # load dataset
-filename = 'data/results.tsv'
+filename = '../../data/tweet_response.tsv'
 doc = load_doc(filename)
 # split into tweet/response
 #to_pairs(doc)
