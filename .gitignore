@@ -1,0 +1,12 @@
+.floydexpt
+.floydignore
+.ipynb_checkpoints/
+README.md
+Untitled.ipynb
+Untitled1.ipynb
+__pycache__/
+chatbot.ipynb
+data/
+floyd.yml
+model.h5
+tweets.db 
