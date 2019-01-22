@@ -94,7 +94,7 @@ del dataset
 model = define_model(tweet_vocab_size, response_vocab_size, tweet_length, response_length, 256)
 #model = define_non_seq_model(tweet_vocab_size, response_vocab_size, tweet_length, response_length, 256)
 adam = Adam(lr=0.0001, decay=0.00001)
-model.compile(optimizer='adam', loss='categorical_crossentropy')
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 # summarize defined model
 print(model.summary())
 
@@ -140,4 +140,4 @@ for i in range(250):
 	# fit model
 	filename = 'model.h5'
 	checkpoint = ModelCheckpoint(filename, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-	model.fit(batch_trainX, batch_trainY, epochs=8, batch_size=64, validation_data=(batch_testX, batch_testY), callbacks=[checkpoint], verbose=2)
+	model.fit(batch_trainX, batch_trainY, epochs=4, batch_size=64, validation_data=(batch_testX, batch_testY), callbacks=[checkpoint], verbose=2)

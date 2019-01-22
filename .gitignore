@@ -10,3 +10,5 @@ data/
 floyd.yml
 model.h5
 tweets.db 
+*.pkl
+*.ipynb
