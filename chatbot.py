@@ -14,7 +14,7 @@ def load_clean_sentences(filename):
 
 # fit a tokenizer
 def create_tokenizer(lines):
-	tokenizer = Tokenizer()
+	tokenizer = Tokenizer(num_words=5000)
 	tokenizer.fit_on_texts(lines)
 	return tokenizer
 
@@ -39,6 +39,7 @@ def word_for_id(integer, tokenizer):
 
 # generate target given source sequence
 def predict_sequence(model, tokenizer, source):
+	#print(source)
 	prediction = model.predict(source, verbose=0)[0]
 	integers = [argmax(vector) for vector in prediction]
 	target = list()
@@ -85,9 +86,10 @@ testX = encode_sequences(tweet_tokenizer, tweet_length, test[:, 0])
 
 # load model
 model = load_model('model.h5')
+print(model.summary())
 # test on some training sequences
-print('train')
-evaluate_model(model, response_tokenizer, trainX, train)
+#print('train')
+#evaluate_model(model, response_tokenizer, trainX, train)
 # test on some test sequences
 print('test')
 evaluate_model(model, response_tokenizer, testX, test)

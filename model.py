@@ -79,13 +79,13 @@ test = load_clean_sentences(data_folder+'/tweet-response-test.pkl')
 # prepare english tokenizer
 tweet_tokenizer = create_tokenizer(dataset[:, 0])
 tweet_vocab_size = min(len(tweet_tokenizer.word_index), 5000) + 1
-tweet_length = max_length(dataset[:, 0])
+tweet_length = 30
 print('Tweet Vocabulary Size: %d' % tweet_vocab_size)
 print('Tweet Max Length: %d' % (tweet_length))
 # prepare german tokenizer
 response_tokenizer = create_tokenizer(dataset[:, 1])
 response_vocab_size = min(len(response_tokenizer.word_index), 5000) + 1
-response_length = max_length(dataset[:, 1])
+response_length = 30
 print('Response Vocabulary Size: %d' % response_vocab_size)
 print('Response Max Length: %d' % (response_length))
 del dataset 
