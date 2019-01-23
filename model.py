@@ -124,7 +124,7 @@ batch_testY = encode_output(batch_testY, response_vocab_size)
 
 MINI_BATCH_SIZE=1000
 
-for i in range(4096):
+for i in range(250):
 	batch_start = i * MINI_BATCH_SIZE
 	batch_end = batch_start+MINI_BATCH_SIZE
 	print('batch_start={} batch_end={}'.format(batch_start, batch_end))

@@ -40,7 +40,7 @@ def word_for_id(integer, tokenizer):
 # generate target given source sequence
 def predict_sequence(model, tokenizer, source):
 	#print(source)
-	prediction = model.predict(source, verbose=0s)[0]
+	prediction = model.predict(source, verbose=0)[0]
 	integers = [argmax(vector) for vector in prediction]
 	target = list()
 	for i in integers:
