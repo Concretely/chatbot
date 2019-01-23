@@ -110,6 +110,8 @@ testX = encode_sequences(tweet_tokenizer, tweet_length, test[:, 0])
 testY = encode_sequences(response_tokenizer, response_length, test[:, 1])
 #testY = encode_output(testY, response_vocab_size)
 
+np.random.shuffle(trainX)
+
 idx = np.random.choice(np.arange(len(testX)), 1000, replace=False)
 batch_testX = testX[idx]
 batch_testY = testY[idx]
@@ -122,7 +124,7 @@ batch_testY = encode_output(batch_testY, response_vocab_size)
 
 MINI_BATCH_SIZE=1000
 
-for i in range(250):
+for i in range(4096):
 	batch_start = i * MINI_BATCH_SIZE
 	batch_end = batch_start+MINI_BATCH_SIZE
 	print('batch_start={} batch_end={}'.format(batch_start, batch_end))
